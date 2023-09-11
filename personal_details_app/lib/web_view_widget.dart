@@ -9,6 +9,7 @@ class GithubWebPage extends StatefulWidget {
 }
 
 class _GithubWebPageState extends State<GithubWebPage> {
+  int progress = 0;
   late WebViewController _controller;
 
   @override
@@ -21,6 +22,9 @@ class _GithubWebPageState extends State<GithubWebPage> {
         NavigationDelegate(
           onProgress: (int progress) {
             // Update loading bar.
+            setState(() {
+              this.progress = progress;
+            });
           },
           onPageStarted: (String url) {},
           onPageFinished: (String url) {},
@@ -42,9 +46,27 @@ class _GithubWebPageState extends State<GithubWebPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('GitHub Profile'),
-      ),
+          title: const Text('GitHub Profile'),
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(4),
+            child: progress != 100
+                ? LinearProgressIndicator(
+                    value: 0.01 * progress,
+                    backgroundColor: Colors.white,
+                    color: Colors.deepPurple,
+                  )
+                : Divider(
+                    color: Colors.grey.shade300,
+                    height: 1,
+                  ),
+          )),
       body: WebViewWidget(controller: _controller),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.clearLocalStorage();
+    super.dispose();
   }
 }
